@@ -42,8 +42,12 @@ export default function SessionSeats() {
     setReserving(true);
     try {
       const reservation = await reservations.create(selectedSeat.id);
-      toast.success(`Assento ${selectedSeat.seat_number} reservado!`);
-      navigate('/reservations');
+      toast.success(`Assento ${selectedSeat.seat_number} reservado! Finalizando...`);
+
+      // Auto checkout
+      await reservations.checkout(reservation.id);
+      toast.success('Ingresso gerado com sucesso! 🎬');
+      navigate('/tickets');
     } catch (err) {
       const message = err instanceof Error ? err.message : 'Erro';
       try {
@@ -69,43 +73,43 @@ export default function SessionSeats() {
         </Button>
 
         <h1 className="text-2xl font-bold text-foreground mb-2">Escolha seu Assento</h1>
-            <p className="text-muted-foreground text-sm mb-8">Selecione um assento disponível e confirme sua reserva</p>
+        <p className="text-muted-foreground text-sm mb-8">Selecione um assento disponível e confirme sua reserva</p>
 
-            {loading ? (
-              <div className="flex justify-center py-16">
-                <Loader2 className="h-8 w-8 animate-spin text-primary" />
+        {loading ? (
+          <div className="flex justify-center py-16">
+            <Loader2 className="h-8 w-8 animate-spin text-primary" />
+          </div>
+        ) : (
+          <>
+            <SeatGrid
+              seats={seats}
+              selectedSeatId={selectedSeat?.id ?? null}
+              onSelectSeat={handleSelectSeat}
+            />
+
+            <div className="mt-8 cinema-card p-5 flex items-center justify-between">
+              <div>
+                {selectedSeat ? (
+                  <p className="text-foreground font-medium">
+                    Assento selecionado: <span className="text-primary">{selectedSeat.seat_number}</span>
+                  </p>
+                ) : (
+                  <p className="text-muted-foreground text-sm">Nenhum assento selecionado</p>
+                )}
               </div>
-            ) : (
-              <>
-                <SeatGrid
-                  seats={seats}
-                  selectedSeatId={selectedSeat?.id ?? null}
-                  onSelectSeat={handleSelectSeat}
-                />
-
-                <div className="mt-8 cinema-card p-5 flex items-center justify-between">
-                  <div>
-                    {selectedSeat ? (
-                      <p className="text-foreground font-medium">
-                        Assento selecionado: <span className="text-primary">{selectedSeat.seat_number}</span>
-                      </p>
-                    ) : (
-                      <p className="text-muted-foreground text-sm">Nenhum assento selecionado</p>
-                    )}
-                  </div>
-                  <Button
-                    onClick={handleReserve}
-                    disabled={!selectedSeat || reserving}
-                  >
-                    {reserving ? (
-                      <><Loader2 className="h-4 w-4 animate-spin mr-1" /> Reservando...</>
-                    ) : (
-                      'Reservar Assento'
-                    )}
-                  </Button>
-                </div>
-              </>
-            )}
+              <Button
+                onClick={handleReserve}
+                disabled={!selectedSeat || reserving}
+              >
+                {reserving ? (
+                  <><Loader2 className="h-4 w-4 animate-spin mr-1" /> Processando...</>
+                ) : (
+                  'Reservar e Comprar'
+                )}
+              </Button>
+            </div>
+          </>
+        )}
       </main>
     </div>
   );
