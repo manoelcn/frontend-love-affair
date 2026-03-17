@@ -68,32 +68,7 @@ export default function SessionSeats() {
           </Link>
         </Button>
 
-        {activeReservation ? (
-          <div className="cinema-card p-8 text-center space-y-4">
-            <CheckCircle className="h-12 w-12 text-primary mx-auto" />
-            <h2 className="text-xl font-bold text-foreground">Reserva Confirmada!</h2>
-            <p className="text-muted-foreground text-sm">
-              Assento <span className="text-primary font-medium">{reservedSeatNumber}</span> reservado com sucesso.
-            </p>
-            <p className="text-xs text-muted-foreground">
-              Expira em {format(new Date(activeReservation.reserved_until), "dd/MM/yyyy 'às' HH:mm", { locale: ptBR })}
-            </p>
-            <div className="flex gap-3 justify-center pt-2">
-              <Button variant="outline" onClick={() => navigate('/')}>
-                Voltar ao Início
-              </Button>
-              <Button onClick={handleCheckout} disabled={checkingOut}>
-                {checkingOut ? (
-                  <><Loader2 className="h-4 w-4 animate-spin mr-1" /> Processando...</>
-                ) : (
-                  <><ShoppingCart className="h-4 w-4 mr-1" /> Comprar Ingresso</>
-                )}
-              </Button>
-            </div>
-          </div>
-        ) : (
-          <>
-            <h1 className="text-2xl font-bold text-foreground mb-2">Escolha seu Assento</h1>
+        <h1 className="text-2xl font-bold text-foreground mb-2">Escolha seu Assento</h1>
             <p className="text-muted-foreground text-sm mb-8">Selecione um assento disponível e confirme sua reserva</p>
 
             {loading ? (
