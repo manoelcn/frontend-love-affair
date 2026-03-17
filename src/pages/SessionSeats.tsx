@@ -1,15 +1,13 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { sessions as sessionsApi, reservations, type Seat, type Reservation } from '@/lib/api';
+import { sessions as sessionsApi, reservations, type Seat } from '@/lib/api';
 import { useAuth } from '@/contexts/AuthContext';
 import { Header } from '@/components/Header';
 import { SeatGrid } from '@/components/SeatGrid';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, Loader2, ShoppingCart, CheckCircle } from 'lucide-react';
+import { ArrowLeft, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { Link } from 'react-router-dom';
-import { format } from 'date-fns';
-import { ptBR } from 'date-fns/locale';
 
 export default function SessionSeats() {
   const { sessionId } = useParams<{ sessionId: string }>();
