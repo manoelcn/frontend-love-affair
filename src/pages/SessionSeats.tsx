@@ -100,7 +100,7 @@ export default function SessionSeats() {
                 {reserving ? (
                   <><Loader2 className="h-4 w-4 animate-spin mr-1" /> Processando...</>
                 ) : (
-                  'Reservar e Comprar'
+                  'Reservar Assento'
                 )}
               </Button>
             </div>
