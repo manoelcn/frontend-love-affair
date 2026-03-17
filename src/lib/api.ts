@@ -183,8 +183,6 @@ export const reservations = {
   checkout: (reservationId: number) =>
     apiFetch<void>(`/reservations/${reservationId}/checkout/`, { method: 'POST' }, true),
 
-  list: (page = 1) =>
-    apiFetch<PaginatedResponse<Reservation>>(`/reservations/?page=${page}`, {}, true),
 };
 
 // Tickets
