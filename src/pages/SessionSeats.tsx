@@ -106,8 +106,6 @@ export default function SessionSeats() {
                 </div>
               </>
             )}
-          </>
-        )}
       </main>
     </div>
   );
