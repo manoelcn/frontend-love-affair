@@ -177,12 +177,14 @@ export const sessions = {
 
 // Reservations
 export const reservations = {
+  list: (page = 1) =>
+    apiFetch<PaginatedResponse<Reservation>>(`/reservations/?page=${page}`, {}, true),
+
   create: (seatId: number) =>
     apiFetch<Reservation>('/reservations/', { method: 'POST', body: JSON.stringify({ seat: seatId }) }, true),
 
   checkout: (reservationId: number) =>
     apiFetch<void>(`/reservations/${reservationId}/checkout/`, { method: 'POST' }, true),
-
 };
 
 // Tickets
