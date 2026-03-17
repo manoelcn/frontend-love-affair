@@ -18,9 +18,6 @@ export default function SessionSeats() {
   const [loading, setLoading] = useState(true);
   const [selectedSeat, setSelectedSeat] = useState<Seat | null>(null);
   const [reserving, setReserving] = useState(false);
-  const [activeReservation, setActiveReservation] = useState<Reservation | null>(null);
-  const [reservedSeatNumber, setReservedSeatNumber] = useState<string>('');
-  const [checkingOut, setCheckingOut] = useState(false);
 
   useEffect(() => {
     if (!sessionId) return;
