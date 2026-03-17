@@ -8,6 +8,7 @@ import Login from "./pages/Login";
 import Register from "./pages/Register";
 import MovieSessions from "./pages/MovieSessions";
 import SessionSeats from "./pages/SessionSeats";
+import Reservations from "./pages/Reservations";
 
 import Tickets from "./pages/Tickets";
 import NotFound from "./pages/NotFound";
