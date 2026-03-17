@@ -58,27 +58,6 @@ export default function SessionSeats() {
     }
   };
 
-  const handleCheckout = async () => {
-    if (!activeReservation) return;
-    setCheckingOut(true);
-    try {
-      await reservations.checkout(activeReservation.id);
-      toast.success('Ingresso gerado com sucesso! 🎬');
-      navigate('/tickets');
-    } catch (err) {
-      const message = err instanceof Error ? err.message : 'Erro';
-      try {
-        const parsed = JSON.parse(message);
-        const firstError = Object.values(parsed).flat()[0];
-        toast.error(String(firstError));
-      } catch {
-        toast.error('Erro ao finalizar compra. Tente novamente.');
-      }
-    } finally {
-      setCheckingOut(false);
-    }
-  };
-
   return (
     <div className="min-h-screen bg-background">
       <Header />
