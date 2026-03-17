@@ -24,15 +24,9 @@ export function Header() {
           {isAuthenticated ? (
             <>
               <Button variant="ghost" size="sm" asChild>
-                <Link to="/reservations">
-                  <Clock className="h-4 w-4 mr-1" />
-                  Reservas
-                </Link>
-              </Button>
-              <Button variant="ghost" size="sm" asChild>
                 <Link to="/tickets">
                   <Ticket className="h-4 w-4 mr-1" />
-                  Ingressos
+                  Meus Ingressos
                 </Link>
               </Button>
               <Button variant="outline" size="sm" onClick={handleLogout}>
