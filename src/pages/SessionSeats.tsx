@@ -1,13 +1,15 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { sessions as sessionsApi, reservations, type Seat } from '@/lib/api';
+import { sessions as sessionsApi, reservations, type Seat, type Reservation } from '@/lib/api';
 import { useAuth } from '@/contexts/AuthContext';
 import { Header } from '@/components/Header';
 import { SeatGrid } from '@/components/SeatGrid';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, Loader2 } from 'lucide-react';
+import { ArrowLeft, Loader2, ShoppingCart, CheckCircle } from 'lucide-react';
 import { toast } from 'sonner';
 import { Link } from 'react-router-dom';
+import { format } from 'date-fns';
+import { ptBR } from 'date-fns/locale';
 
 export default function SessionSeats() {
   const { sessionId } = useParams<{ sessionId: string }>();
@@ -18,6 +20,9 @@ export default function SessionSeats() {
   const [loading, setLoading] = useState(true);
   const [selectedSeat, setSelectedSeat] = useState<Seat | null>(null);
   const [reserving, setReserving] = useState(false);
+  const [activeReservation, setActiveReservation] = useState<Reservation | null>(null);
+  const [reservedSeatNumber, setReservedSeatNumber] = useState<string>('');
+  const [checkingOut, setCheckingOut] = useState(false);
 
   useEffect(() => {
     if (!sessionId) return;
@@ -41,9 +46,10 @@ export default function SessionSeats() {
 
     setReserving(true);
     try {
-      await reservations.create(selectedSeat.id);
-      toast.success(`Assento ${selectedSeat.seat_number} reservado com sucesso!`);
-      navigate('/reservations');
+      const reservation = await reservations.create(selectedSeat.id);
+      setActiveReservation(reservation);
+      setReservedSeatNumber(selectedSeat.seat_number);
+      toast.success(`Assento ${selectedSeat.seat_number} reservado!`);
     } catch (err) {
       const message = err instanceof Error ? err.message : 'Erro';
       try {
@@ -58,6 +64,27 @@ export default function SessionSeats() {
     }
   };
 
+  const handleCheckout = async () => {
+    if (!activeReservation) return;
+    setCheckingOut(true);
+    try {
+      await reservations.checkout(activeReservation.id);
+      toast.success('Ingresso gerado com sucesso! 🎬');
+      navigate('/tickets');
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'Erro';
+      try {
+        const parsed = JSON.parse(message);
+        const firstError = Object.values(parsed).flat()[0];
+        toast.error(String(firstError));
+      } catch {
+        toast.error('Erro ao finalizar compra. Tente novamente.');
+      }
+    } finally {
+      setCheckingOut(false);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-background">
       <Header />
@@ -68,42 +95,69 @@ export default function SessionSeats() {
           </Link>
         </Button>
 
-        <h1 className="text-2xl font-bold text-foreground mb-2">Escolha seu Assento</h1>
-        <p className="text-muted-foreground text-sm mb-8">Selecione um assento disponível e confirme sua reserva</p>
-
-        {loading ? (
-          <div className="flex justify-center py-16">
-            <Loader2 className="h-8 w-8 animate-spin text-primary" />
-          </div>
-        ) : (
-          <>
-            <SeatGrid
-              seats={seats}
-              selectedSeatId={selectedSeat?.id ?? null}
-              onSelectSeat={handleSelectSeat}
-            />
-
-            <div className="mt-8 cinema-card p-5 flex items-center justify-between">
-              <div>
-                {selectedSeat ? (
-                  <p className="text-foreground font-medium">
-                    Assento selecionado: <span className="text-primary">{selectedSeat.seat_number}</span>
-                  </p>
-                ) : (
-                  <p className="text-muted-foreground text-sm">Nenhum assento selecionado</p>
-                )}
-              </div>
-              <Button
-                onClick={handleReserve}
-                disabled={!selectedSeat || reserving}
-              >
-                {reserving ? (
+        {activeReservation ? (
+          <div className="cinema-card p-8 text-center space-y-4">
+            <CheckCircle className="h-12 w-12 text-primary mx-auto" />
+            <h2 className="text-xl font-bold text-foreground">Reserva Confirmada!</h2>
+            <p className="text-muted-foreground text-sm">
+              Assento <span className="text-primary font-medium">{reservedSeatNumber}</span> reservado com sucesso.
+            </p>
+            <p className="text-xs text-muted-foreground">
+              Expira em {format(new Date(activeReservation.reserved_until), "dd/MM/yyyy 'às' HH:mm", { locale: ptBR })}
+            </p>
+            <div className="flex gap-3 justify-center pt-2">
+              <Button variant="outline" onClick={() => navigate('/')}>
+                Voltar ao Início
+              </Button>
+              <Button onClick={handleCheckout} disabled={checkingOut}>
+                {checkingOut ? (
                   <><Loader2 className="h-4 w-4 animate-spin mr-1" /> Processando...</>
                 ) : (
-                  'Reservar Assento'
+                  <><ShoppingCart className="h-4 w-4 mr-1" /> Comprar Ingresso</>
                 )}
               </Button>
             </div>
+          </div>
+        ) : (
+          <>
+            <h1 className="text-2xl font-bold text-foreground mb-2">Escolha seu Assento</h1>
+            <p className="text-muted-foreground text-sm mb-8">Selecione um assento disponível e confirme sua reserva</p>
+
+            {loading ? (
+              <div className="flex justify-center py-16">
+                <Loader2 className="h-8 w-8 animate-spin text-primary" />
+              </div>
+            ) : (
+              <>
+                <SeatGrid
+                  seats={seats}
+                  selectedSeatId={selectedSeat?.id ?? null}
+                  onSelectSeat={handleSelectSeat}
+                />
+
+                <div className="mt-8 cinema-card p-5 flex items-center justify-between">
+                  <div>
+                    {selectedSeat ? (
+                      <p className="text-foreground font-medium">
+                        Assento selecionado: <span className="text-primary">{selectedSeat.seat_number}</span>
+                      </p>
+                    ) : (
+                      <p className="text-muted-foreground text-sm">Nenhum assento selecionado</p>
+                    )}
+                  </div>
+                  <Button
+                    onClick={handleReserve}
+                    disabled={!selectedSeat || reserving}
+                  >
+                    {reserving ? (
+                      <><Loader2 className="h-4 w-4 animate-spin mr-1" /> Reservando...</>
+                    ) : (
+                      'Reservar Assento'
+                    )}
+                  </Button>
+                </div>
+              </>
+            )}
           </>
         )}
       </main>
