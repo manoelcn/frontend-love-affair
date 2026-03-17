@@ -47,9 +47,8 @@ export default function SessionSeats() {
     setReserving(true);
     try {
       const reservation = await reservations.create(selectedSeat.id);
-      setActiveReservation(reservation);
-      setReservedSeatNumber(selectedSeat.seat_number);
       toast.success(`Assento ${selectedSeat.seat_number} reservado!`);
+      navigate('/reservations');
     } catch (err) {
       const message = err instanceof Error ? err.message : 'Erro';
       try {
