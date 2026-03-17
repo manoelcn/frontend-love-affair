@@ -41,13 +41,9 @@ export default function SessionSeats() {
 
     setReserving(true);
     try {
-      const reservation = await reservations.create(selectedSeat.id);
-      toast.success(`Assento ${selectedSeat.seat_number} reservado! Finalizando...`);
-
-      // Auto checkout
-      await reservations.checkout(reservation.id);
-      toast.success('Ingresso gerado com sucesso! 🎬');
-      navigate('/tickets');
+      await reservations.create(selectedSeat.id);
+      toast.success(`Assento ${selectedSeat.seat_number} reservado com sucesso!`);
+      navigate('/reservations');
     } catch (err) {
       const message = err instanceof Error ? err.message : 'Erro';
       try {
