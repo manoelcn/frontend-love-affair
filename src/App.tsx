@@ -27,6 +27,7 @@ const App = () => (
             <Route path="/movies/:movieId/sessions" element={<MovieSessions />} />
             <Route path="/sessions/:sessionId/seats" element={<SessionSeats />} />
             <Route path="/tickets" element={<Tickets />} />
+            <Route path="/reservations" element={<Reservations />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </AuthProvider>
